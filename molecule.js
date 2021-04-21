@@ -1,30 +1,25 @@
 /**
  * @Date:   2021-01-19T17:16:18+00:00
- * @Last modified time: 2021-04-18T16:26:33+01:00
+ * @Last modified time: 2021-04-21T19:54:45+01:00
  */
 
 
 
-//creating molecule object
+//creating superclass molecule object
 class Molecule {
 
-  //defining properties
+  //setting initial values for object attributes
   //setting position, speed, molecule size and colour of the molecule - these properties can be edited in gui
-  // constructor(_i ) {
-  //   this.position = createVector(200, 200);
-  //   this.velocity = createVector(random(-2.5, 2.5), random(-2.5, 2.5));
-  //   this.radius = random(obj.minMoleculeSize, obj.maxMoleculeSize);
-  //   this.fillColor = color(255, 0, 0);
-  //   this.currentColor = this.fillColor;
-  //   // this.intersectingColor = color(100,0,0);
-  //   this.index = _i;
-  // }
-  constructor({_i, px= random(0,width), py= random(0,width)} ) {
+  constructor({
+    _i,
+    px = random(0, width),
+    py = random(0, width)
+  }) {
     this.position = createVector(px, py);
-    this.velocity = createVector(random(-2.5,5), random(-2.5, 5));
+    this.velocity = createVector(random(-2.5, 2.5), random(-2.5, 2.5));
     this.radius = random(obj.minMoleculeSize, obj.maxMoleculeSize);
     this.fillColor = color(255, 0, 0);
-    this.intersectingColor = color(155,155,155);
+    this.intersectingColor = color(155, 155, 155);
     this.currentColor = this.fillColor;
     // this.intersectingColor = color(100,0,0);
     this.index = _i;
@@ -38,9 +33,13 @@ class Molecule {
     ellipse(this.position.x, this.position.y, this.radius * 2, this.radius * 2);
     fill(0);
     (obj.showText) ? (
-      textSize(16),
+      textSize(10),
       textAlign(CENTER),
-      text(this.index, this.position.x, this.position.y + 6)) : null;
+      fill(255,255,255),
+      text(this.index, this.position.x, this.position.y),
+      fill(255,255,255),
+      text(this.constructor.name, this.position.x, this.position.y + 10 )) : null;
+
   }
 
   //checking molecule intersection
@@ -58,8 +57,6 @@ class Molecule {
     //difference in positions and square root
     //pythagerous distance between balls
     //let dist = dist(this.position.x, this.position.y, molecules[_molecule].position.x, molecules[_molecule].position.y)
-
-
 
     if (check) {
 
@@ -122,7 +119,6 @@ class Molecule {
     molecules[_otherMolecule.index].position.x += moveX;
     molecules[_otherMolecule.index].position.y += moveY;
 
-    //console.log(molecules);
   }
 
   //change colour when the molecules overlap to the colour set in gui
@@ -141,7 +137,8 @@ class Molecule {
     (this.position.x >= width - this.radius || this.position.x <= 0 + this.radius) ?
     this.velocity.x *= -1: null;
 
-    (this.position.y >= height - this.radius || this.position.y <= 0 + this.radius) ?
+   //minus 160 so the balls dont overlap the graph
+    (this.position.y >= height - this.radius - 160 || this.position.y <= 0 + this.radius) ?
     this.velocity.y *= -1: null;
 
     this.position.x += this.velocity.x;

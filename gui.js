@@ -1,21 +1,21 @@
 /**
  * @Date:   2021-01-19T17:15:34+00:00
- * @Last modified time: 2021-04-21T09:32:42+01:00
+ * @Last modified time: 2021-04-21T20:30:37+01:00
  */
 
 //setting the variables that we can configure
 let obj = {
-    numOfMolecules:20
-    , numRows: 2
-    , numCols: 2
-    , showText: false
+    numOfMolecules:50
+    , numRows: 4
+    , numCols: 4
+    , showText: true
     , loopState: true
     , gridState: true
     , lineState: true
     , moleculeColor: [255, 0, 0]
     , intersectingColor: [0, 255, 0]
-    , minMoleculeSize: 20
-    , maxMoleculeSize: 20
+    , minMoleculeSize: 22
+    , maxMoleculeSize: 22
 };
 
 //creating new gui called gui

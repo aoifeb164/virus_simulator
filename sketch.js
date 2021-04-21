@@ -1,26 +1,28 @@
 /**
  * @Date:   2021-01-19T17:18:38+00:00
- * @Last modified time: 2021-04-21T10:13:21+01:00
+ * @Last modified time: 2021-04-21T20:52:40+01:00
  */
 
 
-//creating variables - creating empty molecules and grid arrays and colWidth and rowHeight
+//creating variables
+//setting percent of infected molecules
 let molecules = [];
 let grid = [];
 let graphArray = [];
-
-let graphHeight = 100;
+let graphHeight = 150;
 let colWidth, rowHeight;
-let percentOfInfected = .4;
+let percentOfInfected = .28;
 
 //used to initialize enviornment properties - runs when program starts
 //sets canvas size, rowHeight and colWidth
 //calls gridify and checkLoop functions
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(1000, 1000);
   colWidth = width / obj.numCols;
   rowHeight = height / obj.numRows;
+
   //creates new molecule object starting from 0
+  // pushing new infected and healthy molecules into the array
   molecules = [];
   for (let i = 0; i < obj.numOfMolecules; i++) {
     let randomNum = random();
@@ -51,43 +53,22 @@ function draw() {
     molecule.reset();
   });
 
+//running recovery, drawGraph, splitObjectIntoGrid and drawGrid functions
   recovery();
   drawGraph();
-
-  //runs checkIntersections or splitObjectIntoGrid
   splitObjectIntoGrid();
   drawGrid();
-  //checkIntersectionsOld();
+
   //checking if gridtstate is on or off
   obj.gridState ? drawGrid() : null;
 
-  //runs the render and step functions for each molecule
+  //runs the render and step functions for each molecule from molecule.js
   molecules.forEach((molecule) => {
     molecule.render();
     molecule.step();
   });
 
-  console.log(frameCount);
-}
-
-//checking when the molecules are intersecting
-//runs a nested for loop itterating through the molecules array - this ensures the molecules do not check themselves for intersection
-function checkIntersectionsOld() {
-  //console.time("old method")
-  for (let a = 0; a < molecules.length; a++) {
-    for (let b = a + 1; b < molecules.length; b++) {
-      let moleculeA = molecules[a];
-      let moleculeB = molecules[b];
-      //if statemnt - if the line state is turned on draw the line between the molecules based on their positions with a stroke colour of grey
-      if (obj.lineState) {
-        stroke(125, 100);
-        line(moleculeA.position.x, moleculeA.position.y, moleculeB.position.x, moleculeB.position.y);
-      };
-      // if molecule a intersects molecule b change colour if not do nothing
-      moleculeA.isIntersecting(moleculeB) ? (moleculeA.changeColor(), moleculeB.changeColor()) : null;
-    }
-  }
-  //console.timeEnd("old method")
+  // console.log(frameCount);
 }
 
 //checking when the molecules are intersecting passing _collection as parameter
@@ -122,7 +103,7 @@ function checkIntersections(_collection) {
           if (moleculeB.constructor.name === "Infected" && moleculeA.constructor.name === "Healthy") {
             let randomOdds = random(1);
             //50% chance of infection
-            if (randomOdds < 0.1) {
+            if (randomOdds < 0.5) {
               //takes info from ballB
               let tempObject = {
                 _i: moleculeA.index,
@@ -158,7 +139,6 @@ function splitObjectIntoGrid() {
       checkIntersections(moleculeCollection);
     }
   }
-  //console.timeEnd("new method")
 }
 
 //ensures the molecules are spaced out evenly across the gird when the program starts or is refreshed -- called in setup function
@@ -173,7 +153,6 @@ function gridify() {
     //assigned row pos to index divided by numDivision and rounded down then multiplied by spacing
     let colPos = (index % numDivision) * spacing;
     let rowPos = floor(index / numDivision) * spacing;
-    //console.log(`The col pos ${colPos} and the row pos ${rowPos}`);
     //assigning molecule pos x to col pos plus 20
     //assigning molecule pos y to row pos plus 20
     molecule.position.x = colPos + (obj.maxMoleculeSize * 2);
@@ -182,6 +161,7 @@ function gridify() {
   });
 }
 
+//drawing the graph that displays the amount of each type of molecule
 function drawGraph() {
 
   let numInfected = molecules.filter(molecule => molecule.constructor.name == "Infected")
@@ -192,10 +172,11 @@ function drawGraph() {
   hHeight = map(numHealthy.length, 0, obj.numOfMolecules, 0, graphHeight);
   rHeight = map(numRecovered.length, 0, obj.numOfMolecules, 0, graphHeight);
 
-  if (graphArray.length >= 300) {
+  if (graphArray.length >= 500) {
     graphArray.shift();
   }
 
+//pushing into graphArray
   graphArray.push({
     numInfected: numInfected.length,
     numHealthy: numHealthy.length,
@@ -207,25 +188,31 @@ function drawGraph() {
   //console.log(graphArray);
 
   push();
-  translate(300, 800);
+  translate(250, 1000);
   graphArray.forEach(function(data, index) {
 
     noStroke();
-    fill(255, 0, 0)
-    rect(index, 0, 1, -data.iHeight)
 
-    fill(0, 255, 0);
+    fill(255, 0, 0)
+    line(index, 0, 1, -data.iHeight)
+
+    fill(43,43,43);
     rect(index, -data.iHeight, 1, -data.hHeight)
 
-    fill(237, 211, 40);
-    rect(index, -data.iHeight, -data.hHeight, -data.rHeight)
+    fill(184, 184, 184);
+    rect(index, -data.iHeight -data.hHeight,1, -data.rHeight)
+
+
+
   })
   pop();
 }
 
-function recovery(){
+//changing the infected balls to Recovered
+//replacing the balls based on the time they were rendered and the frameCount
+function recovery() {
   molecules.forEach((molecule) => {
-    if (frameCount > molecule.Birthdate + molecule.life){
+    if (frameCount > molecule.Birthdate + molecule.life) {
       let tempObject = {
         _i: molecule.index,
         px: molecule.position.x,
@@ -242,7 +229,6 @@ function recovery(){
 // within rows(j). colWidth and rowWidth are calculated in the setup(). The style
 // of grid is defined by fill, stroke and strokeWeight. There
 // are no parameters required to fulfil the function and no returns
-
 function drawGrid() {
   noFill();
   stroke(155, 155, 155, 50);
@@ -251,7 +237,7 @@ function drawGrid() {
   for (let j = 0; j < obj.numRows; j++) {
     for (let i = 0; i < obj.numCols; i++) {
       //
-      rect(i * colWidth, j * rowHeight, colWidth, rowHeight)
+      rect(i * rowHeight, j * colWidth, colWidth, rowHeight)
     }
   }
 }
