@@ -1,6 +1,6 @@
 /**
  * @Date:   2021-01-19T17:16:18+00:00
- * @Last modified time: 2021-04-22T17:25:17+01:00
+ * @Last modified time: 2021-04-22T20:04:48+01:00
  */
 
 
@@ -8,15 +8,17 @@
 //creating superclass molecule object
 class Molecule {
 
-  //setting initial values for object attributes
+  //setting initial values for default attributes
   //setting position, speed, molecule size and colour of the molecule - these properties can be edited in gui
   constructor({
     _i,
     px = random(0, width),
-    py = random(0, width)
+    py = random(0, width),
+    vx = random(-2.5, 2.5),
+    vy = random(-2.5, 2.5)
   }) {
     this.position = createVector(px, py);
-    this.velocity = createVector(random(-2.5, 2.5), random(-2.5, 2.5));
+    this.velocity = createVector(vx, vy);
     this.radius = random(obj.minMoleculeSize, obj.maxMoleculeSize);
     this.fillColor = color(255, 0, 0);
     this.intersectingColor = color(156, 0, 0);
@@ -42,28 +44,24 @@ class Molecule {
   }
 
   //checking molecule intersection
-  //assigning distance as distance of molecules x and y position
   //assigning gap as distance minus radius
   //assigning check to gap less than or equal to 0  and if its true or false
   isIntersecting(_molecule) {
+    //creates new vector without affecting the other vectors weve created
     let resultantV = p5.Vector.sub(this.position, _molecule.position);
-    // let distance = dist(this.position.x, this.position.y, _molecule.position.x, _molecule.position.y)
+    //distance is length of resultant
     let distance = resultantV.mag();
     let gap = distance - this.radius - _molecule.radius;
     let check = (gap <= 0) ? true : false;
 
-    //change in x and y
-    //difference in positions and square root
-    //pythagerous distance between balls
-    //let dist = dist(this.position.x, this.position.y, molecules[_molecule].position.x, molecules[_molecule].position.y)
+
 
     if (check) {
-
+      //taking 2 points and calulating dx and dy to get the distance
       let dx = this.position.x - _molecule.position.x;
       let dy = this.position.y - _molecule.position.y;
-      // let dist = Math.sqrt(dx * dx + dy * dy);
 
-      //
+      //reaction to check
       let normalX = dx / distance;
       let normalY = dy / distance;
 
@@ -73,12 +71,11 @@ class Molecule {
       let midpointY = (this.position.y + _molecule.position.y) / 2;
 
 
-      //calc difference in x velocity and multiply by normal
+      //calc difference in velocity and multiply by normal
       let dVector = (this.velocity.x - _molecule.velocity.x) * normalX;
       dVector += (this.velocity.y - _molecule.velocity.y) * normalY;
 
-
-
+      //differences in velocity multiplying by normal
       let dvx = dVector * normalX;
       let dvy = dVector * normalY;
 
@@ -96,13 +93,14 @@ class Molecule {
     return check;
   }
 
+  //
   dedock(_otherMolecule) {
     //This is the ball we want to move (latest in Array)
     // This is where we want to dock it to
     let fixedBall = molecules[_otherMolecule.index];
 
     //creates new vector called resultantV
-    //based on differences between ball points
+    //based on differences between molecule points
     let resultantV = p5.Vector.sub(this.position, fixedBall.position)
     //angle pointing at (direction)
     let rHeading = resultantV.heading();
@@ -133,10 +131,10 @@ class Molecule {
   //creating movement of the molecules
   step() {
 
-    (this.position.x >= width - this.radius || this.position.x < 0 + this.radius) ?
+    (this.position.x >= width - this.radius -10 || this.position.x < 0 + this.radius +10 ) ?
     this.velocity.x *= -1: null;
 
-    //minus 160 so the balls dont overlap the graph
+    //minus 160 so the molecules dont overlap the graph
     (this.position.y >= height - this.radius -160 || this.position.y <= 0 + this.radius + 10 ) ?
     this.velocity.y *= -1: null;
 

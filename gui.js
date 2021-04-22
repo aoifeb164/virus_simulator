@@ -1,13 +1,13 @@
 /**
  * @Date:   2021-01-19T17:15:34+00:00
- * @Last modified time: 2021-04-22T16:37:57+01:00
+ * @Last modified time: 2021-04-22T19:54:09+01:00
  */
 
 //setting the variables that we can configure
 let obj = {
-    numOfMolecules:55
-    , numRows: 4
-    , numCols: 4
+    numOfMolecules:50
+    , numRows: 5
+    , numCols: 5
     , showText: false
     , loopState: true
     , gridState: true
@@ -54,12 +54,7 @@ section01.add(obj, 'lineState').onChange(function () {
 //creating new gui folder called Design
 //this allows you to change the colour of molecules originally or when they intersect and molecule size
 section02 = gui.addFolder('Design');
-// section02.addColor(obj, 'moleculeColor').onChange(function () {
-//     draw()
-// });
-// section02.addColor(obj, 'intersectingColor').onChange(function () {
-//     draw()
-// });
+
 section02.add(obj, 'minMoleculeSize').min(1).max(50).step(1).onChange(function () {
     setup();
     draw()

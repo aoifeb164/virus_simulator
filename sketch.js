@@ -1,6 +1,6 @@
 /**
  * @Date:   2021-01-19T17:18:38+00:00
- * @Last modified time: 2021-04-22T17:49:50+01:00
+ * @Last modified time: 2021-04-22T19:39:40+01:00
  */
 
 // ##CA2 VIRUS SIMULATOR
@@ -96,32 +96,35 @@ function checkIntersections(_collection) {
     for (let b = a + 1; b < _collection.length; b++) {
       let moleculeA = molecules[_collection[a]];
       let moleculeB = molecules[_collection[b]];
-      //if statemnt - if the line state is turned on draw the line between the molecules based on their positions with a stroke colour of grey
+      //if statemnt - if the line state is turned on draw the line between the molecules based on their x & y positions with a stroke colour of grey
       if (obj.lineState) {
         stroke(125, 100);
         line(moleculeA.position.x, moleculeA.position.y, moleculeB.position.x, moleculeB.position.y);
       }; // if molecule a intersects molecule b change colour
       moleculeA.isIntersecting(moleculeB) ? (moleculeA.changeColor(), moleculeB.changeColor(), moleculeA.dedock(moleculeB)) : null;
+      //  if when the molecules are intersecting one is infected the chance of the healthy molecule becoming infected is 2.6%
       if (moleculeA.isIntersecting(moleculeB)) {
         if (moleculeA.constructor.name === "Infected" && moleculeB.constructor.name === "Healthy") {
           let randomOdds = random(1);
-          //50% chance of infection
-          if (randomOdds < 0.02) {
-            //takes info from ballB
+          //2.6% chance of infection
+          if (randomOdds < 0.026) {
+            //takes info from ballB and replacing it with infected molecule using splice
+            //splice inserts an object into an existing array
             let tempObject = {
               _i: moleculeB.index,
               px: moleculeB.position.x,
               py: moleculeB.position.y
             }
-            //replace ballB with infected ball
             molecules.splice(tempObject._i, 1, new Infected(tempObject));
           }
         } else {
+            //  if when the molecules are intersecting one is infected the chance of the healthy molecule becoming infected is 2.6%
           if (moleculeB.constructor.name === "Infected" && moleculeA.constructor.name === "Healthy") {
             let randomOdds = random(1);
-            //50% chance of infection
-            if (randomOdds < 0.02) {
-              //takes info from ballB
+            //2.6% chance of infection
+            if (randomOdds < 0.026) {
+                //takes info from ballB and replacing it with infected molecule using splice
+                //splice inserts an object into an existing array
               let tempObject = {
                 _i: moleculeA.index,
                 px: moleculeA.position.x,
@@ -165,14 +168,14 @@ function splitObjectIntoGrid() {
 function gridify() {
   let numDivision = ceil(Math.sqrt(obj.numOfMolecules));
   let spacingY = (width - (obj.minMoleculeSize*2)) / numDivision;
-  let spaceX = (height - graphHeight - (obj.minMoleculeSize*2)) / numDivision;
+  let spacingX = (height - graphHeight - (obj.minMoleculeSize*2)) / numDivision;
 
   //foreach loop taking in molecules array
   //assigning col pos to modulus of index and numDivsion and multiplied by spacing
   //assigned row pos to index divided by numDivision and rounded down then multiplied by spacing
   molecules.forEach((molecule, index) => {
     let colPos = (index % numDivision) * spacingY;
-    let rowPos = floor(index / numDivision) * spaceX;
+    let rowPos = floor(index / numDivision) * spacingX;
     //assigning molecule pos x to col pos plus 20
     //assigning molecule pos y to row pos plus 20
     molecule.position.x = colPos + (obj.maxMoleculeSize * 2);
@@ -186,20 +189,20 @@ function gridify() {
 //drawing the graph that displays the amount of each type of molecule
 function displayGraphCount() {
   {
-    //for loop itterating through the numOfMolecules
-    //if the health of the molecule is healthy count the healthy;
-    //if the health of the molecule is infected count the infected molecules;
-    //if the health of the molecule is recovered count the recovered molecules;
+    //for loop itterating through the numOfMolecules index
+    //if the state of the molecule is healthy count the healthy molecules;
+    //if the state of the molecule is infected count the infected molecules;
+    //if the state of the molecule is recovered count the recovered molecules;
     for (let i = 0; i < obj.numOfMolecules; i++) {
-      if (molecules[i].health == "Healthy") {
+      if (molecules[i].state == "Healthy") {
         countHealth++;
       }
 
-      if (molecules[i].health == "Infected") {
+      if (molecules[i].state == "Infected") {
         countInfected++;
       }
 
-      if (molecules[i].health == "Recovered") {
+      if (molecules[i].state == "Recovered") {
         countRecovered++;
       }
     }
@@ -212,21 +215,22 @@ function displayGraphCount() {
     text("Infected: " + countInfected, 30, 950)
     text("Recovered: " + countRecovered, 30, 1000)
 
-    //setting the heights
+    //mapping the numOfMolecules to be the same number as graphHeight
     let infectedHeight = map(countInfected, 0, obj.numOfMolecules, 0, graphHeight);
     let healthHeight = map(countHealth, 0, obj.numOfMolecules, 0, graphHeight);
     let recoveredHeight = map(countRecovered, 0, obj.numOfMolecules, 0, graphHeight);
 
+    //starting the count at 0
     countHealth = 0;
     countInfected = 0;
     countRecovered = 0;
 
-    //length of graph
+    //setting length of graph to be 500px and allowing it to move with new data as it removes elements as it goes on
     if (graphArray.length >= 500) {
       graphArray.shift();
     }
 
-    //pushing into graphArray
+    //pushing the counted molecules and heights into graphArray
     graphArray.push({
       countInfected: countInfected,
       countHealth: countHealth,
@@ -237,10 +241,12 @@ function displayGraphCount() {
     })
     //console.log(graphArray);
 
+    //The push() function saves the current drawing style settings and transformations, while pop() restores these settings.
     push();
     translate(250, 1000);
     graphArray.forEach(function(data, index) {
 
+      //drawing a rect in the graph to reflect the number of infected, healthy and recovered molecules
       //setting the colour and shape of the graph
       noStroke();
       fill(255, 0, 0)
@@ -269,7 +275,7 @@ function recovery() {
         px: molecule.position.x,
         py: molecule.position.y
       }
-      //replace ballB with infected ball
+      //replace molecule with new recovered molecule
       molecules.splice(tempObject._i, 1, new Recovered(tempObject));
     }
   });
