@@ -1,21 +1,29 @@
 /**
  * @Date:   2021-01-19T17:18:38+00:00
- * @Last modified time: 2021-04-22T19:39:40+01:00
+ * @Last modified time: 2021-04-22T20:19:56+01:00
  */
 
 // ##CA2 VIRUS SIMULATOR
-// -For CA2 I have created a simulator that represents the effect of covid-19 in the Dundalk - Carlingford area.
+// - For CA2 I have created a simulator that represents the effect of covid-19 in the Dundalk - Carlingford area.
 //
-// -Coronavirus disease (COVID-19) is an infectious disease caused by a newly discovered coronavirus.
-// -Most people who fall sick with COVID-19 will experience mild to moderate symptoms and recover without special treatment.
+// - Coronavirus disease (COVID-19) is an infectious disease caused by a newly discovered coronavirus.
+// - Most people who fall sick with COVID-19 will experience mild to moderate symptoms and recover without special treatment.
 //
-// -The subject area currently has 18 confirmed cases with a total population of 25,599.
-// -This means that 1 in 1422 are infected.
-// -Loading 55 molecules on my canvas means roughly 28 of the rendered molecules will be infected.
-// -This means the percent of infection is roughly 50%.
+// - The subject area currently has 18 confirmed cases with a total population of 25,599.
+// - This means that 1 in 1422 are infected.
+// - Loading 55 molecules on my canvas means roughly 28 of the rendered molecules will be infected.
+// - This means the percent of infection is roughly 50%.
 //
-// -The chance of catching the virus if exposed is 2.6%.
-// -For the purpose of the CA to allow you to see the molecules become infected the chance of catching the virus is 50%.
+// - The chance of catching the virus if exposed is 2.6%.
+//
+// - When the program begins 55 molecules will be rendered on the canvas, 50% of these will be infected.
+// - As the molecules move around the screen they will bounce off eachother.
+// - If an infected molecule intersects with a healthy molecule there is a 2.6% chance of the molecule becoming ill.
+// - Each infected molecule is given a date of birth and a life span.
+// - The date of birth of a molecule is the frame number they have been created on.
+// - The life span of the molecule is the amount of frames the molecule will live for.
+// - Once the life of the infected molecule ends the become recovered and can no longer infect other molecules.
+// - The text and graph on the canvas display a live count of the different molecule types.
 
 //creating variables
 //setting percent of infected molecules - this sets the amount of infected balls to rendered when starting the program
