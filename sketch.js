@@ -1,6 +1,6 @@
 /**
  * @Date:   2021-01-19T17:18:38+00:00
- * @Last modified time: 2021-04-22T17:33:39+01:00
+ * @Last modified time: 2021-04-22T17:49:50+01:00
  */
 
 // ##CA2 VIRUS SIMULATOR
@@ -106,7 +106,7 @@ function checkIntersections(_collection) {
         if (moleculeA.constructor.name === "Infected" && moleculeB.constructor.name === "Healthy") {
           let randomOdds = random(1);
           //50% chance of infection
-          if (randomOdds < 0.2) {
+          if (randomOdds < 0.02) {
             //takes info from ballB
             let tempObject = {
               _i: moleculeB.index,
@@ -120,13 +120,14 @@ function checkIntersections(_collection) {
           if (moleculeB.constructor.name === "Infected" && moleculeA.constructor.name === "Healthy") {
             let randomOdds = random(1);
             //50% chance of infection
-            if (randomOdds < 0.2) {
+            if (randomOdds < 0.02) {
               //takes info from ballB
               let tempObject = {
                 _i: moleculeA.index,
                 px: moleculeA.position.x,
                 py: moleculeA.position.y
               }
+              molecules.splice(tempObject._i, 1, new Infected(tempObject));
             }
 
           }
