@@ -1,17 +1,35 @@
 /**
  * @Date:   2021-01-19T17:18:38+00:00
- * @Last modified time: 2021-04-21T20:52:40+01:00
+ * @Last modified time: 2021-04-22T17:33:39+01:00
  */
 
+// ##CA2 VIRUS SIMULATOR
+// -For CA2 I have created a simulator that represents the effect of covid-19 in the Dundalk - Carlingford area.
+//
+// -Coronavirus disease (COVID-19) is an infectious disease caused by a newly discovered coronavirus.
+// -Most people who fall sick with COVID-19 will experience mild to moderate symptoms and recover without special treatment.
+//
+// -The subject area currently has 18 confirmed cases with a total population of 25,599.
+// -This means that 1 in 1422 are infected.
+// -Loading 55 molecules on my canvas means roughly 28 of the rendered molecules will be infected.
+// -This means the percent of infection is roughly 50%.
+//
+// -The chance of catching the virus if exposed is 2.6%.
+// -For the purpose of the CA to allow you to see the molecules become infected the chance of catching the virus is 50%.
 
 //creating variables
-//setting percent of infected molecules
+//setting percent of infected molecules - this sets the amount of infected balls to rendered when starting the program
 let molecules = [];
 let grid = [];
 let graphArray = [];
 let graphHeight = 150;
 let colWidth, rowHeight;
-let percentOfInfected = .28;
+let percentOfInfected = .5;
+let countHealth;
+let countInfected;
+let countRecovered;
+
+
 
 //used to initialize enviornment properties - runs when program starts
 //sets canvas size, rowHeight and colWidth
@@ -21,8 +39,9 @@ function setup() {
   colWidth = width / obj.numCols;
   rowHeight = height / obj.numRows;
 
-  //creates new molecule object starting from 0
+  //creating new molecule object starting from 0
   // pushing new infected and healthy molecules into the array
+  //these molecules are rendered when the program starts
   molecules = [];
   for (let i = 0; i < obj.numOfMolecules; i++) {
     let randomNum = random();
@@ -38,37 +57,35 @@ function setup() {
     }
 
   }
-
   gridify();
   checkLoop();
 }
 
+
 //always called after setup - continuously executes what is inside the function until the program ends
 //sets background colour to white
+//running recovery, displayCounter, drawGraph, splitObjectIntoGrid and drawGrid functions
 function draw() {
   background(255);
-
   //forEach loop for molecules array that runs the molecule reset function
+  //this is used to reset the intersecting colours of the molecules
   molecules.forEach((molecule) => {
     molecule.reset();
   });
 
-//running recovery, drawGraph, splitObjectIntoGrid and drawGrid functions
   recovery();
-  drawGraph();
   splitObjectIntoGrid();
   drawGrid();
-
-  //checking if gridtstate is on or off
+displayGraphCount();
+  //checking if gridtstate is on or off - this can be changed using the gui
   obj.gridState ? drawGrid() : null;
 
-  //runs the render and step functions for each molecule from molecule.js
+  //runs the render and step functions for each molecule
+  //this creates the visual properties of the molecule and makes the molecules move
   molecules.forEach((molecule) => {
     molecule.render();
     molecule.step();
   });
-
-  // console.log(frameCount);
 }
 
 //checking when the molecules are intersecting passing _collection as parameter
@@ -89,7 +106,7 @@ function checkIntersections(_collection) {
         if (moleculeA.constructor.name === "Infected" && moleculeB.constructor.name === "Healthy") {
           let randomOdds = random(1);
           //50% chance of infection
-          if (randomOdds < 0.5) {
+          if (randomOdds < 0.2) {
             //takes info from ballB
             let tempObject = {
               _i: moleculeB.index,
@@ -103,7 +120,7 @@ function checkIntersections(_collection) {
           if (moleculeB.constructor.name === "Infected" && moleculeA.constructor.name === "Healthy") {
             let randomOdds = random(1);
             //50% chance of infection
-            if (randomOdds < 0.5) {
+            if (randomOdds < 0.2) {
               //takes info from ballB
               let tempObject = {
                 _i: moleculeA.index,
@@ -143,16 +160,18 @@ function splitObjectIntoGrid() {
 
 //ensures the molecules are spaced out evenly across the gird when the program starts or is refreshed -- called in setup function
 //assigning numDivision to square root of molecules that is rounded up
+//assigning spacing to the width of the canvas divided by numDivsion
 function gridify() {
   let numDivision = ceil(Math.sqrt(obj.numOfMolecules));
-  let spacing = (width) / numDivision
+  let spacingY = (width - (obj.minMoleculeSize*2)) / numDivision;
+  let spaceX = (height - graphHeight - (obj.minMoleculeSize*2)) / numDivision;
 
-  //setting x & y pos for each molecule in the array based on their col and row pos
+  //foreach loop taking in molecules array
+  //assigning col pos to modulus of index and numDivsion and multiplied by spacing
+  //assigned row pos to index divided by numDivision and rounded down then multiplied by spacing
   molecules.forEach((molecule, index) => {
-    //assigning col pos to modulus of index by numDivsion and multiplied by spacing
-    //assigned row pos to index divided by numDivision and rounded down then multiplied by spacing
-    let colPos = (index % numDivision) * spacing;
-    let rowPos = floor(index / numDivision) * spacing;
+    let colPos = (index % numDivision) * spacingY;
+    let rowPos = floor(index / numDivision) * spaceX;
     //assigning molecule pos x to col pos plus 20
     //assigning molecule pos y to row pos plus 20
     molecule.position.x = colPos + (obj.maxMoleculeSize * 2);
@@ -161,55 +180,86 @@ function gridify() {
   });
 }
 
+// diaplying the molecule counter
+// this counts the number of each molecule type currently displayed on the canvas
 //drawing the graph that displays the amount of each type of molecule
-function drawGraph() {
+function displayGraphCount() {
+  {
+    //for loop itterating through the numOfMolecules
+    //if the health of the molecule is healthy count the healthy;
+    //if the health of the molecule is infected count the infected molecules;
+    //if the health of the molecule is recovered count the recovered molecules;
+    for (let i = 0; i < obj.numOfMolecules; i++) {
+      if (molecules[i].health == "Healthy") {
+        countHealth++;
+      }
 
-  let numInfected = molecules.filter(molecule => molecule.constructor.name == "Infected")
-  let numHealthy = molecules.filter(molecule => molecule.constructor.name == "Healthy")
-  let numRecovered = molecules.filter(molecule => molecule.constructor.name == "Recovered")
+      if (molecules[i].health == "Infected") {
+        countInfected++;
+      }
 
-  iHeight = map(numInfected.length, 0, obj.numOfMolecules, 0, graphHeight);
-  hHeight = map(numHealthy.length, 0, obj.numOfMolecules, 0, graphHeight);
-  rHeight = map(numRecovered.length, 0, obj.numOfMolecules, 0, graphHeight);
+      if (molecules[i].health == "Recovered") {
+        countRecovered++;
+      }
+    }
 
-  if (graphArray.length >= 500) {
-    graphArray.shift();
+    //setting text size and placement
+    textAlign(LEFT);
+    textSize(30);
+    fill(0,0,0);
+    text("Healthy: " + countHealth, 30, 900)
+    text("Infected: " + countInfected, 30, 950)
+    text("Recovered: " + countRecovered, 30, 1000)
+
+    //setting the heights
+    let infectedHeight = map(countInfected, 0, obj.numOfMolecules, 0, graphHeight);
+    let healthHeight = map(countHealth, 0, obj.numOfMolecules, 0, graphHeight);
+    let recoveredHeight = map(countRecovered, 0, obj.numOfMolecules, 0, graphHeight);
+
+    countHealth = 0;
+    countInfected = 0;
+    countRecovered = 0;
+
+    //length of graph
+    if (graphArray.length >= 500) {
+      graphArray.shift();
+    }
+
+    //pushing into graphArray
+    graphArray.push({
+      countInfected: countInfected,
+      countHealth: countHealth,
+      countInfected: countInfected,
+      infectedHeight: infectedHeight,
+      healthHeight: healthHeight,
+      recoveredHeight: recoveredHeight
+    })
+    //console.log(graphArray);
+
+    push();
+    translate(250, 1000);
+    graphArray.forEach(function(data, index) {
+
+      //setting the colour and shape of the graph
+      noStroke();
+      fill(255, 0, 0)
+      rect(index, 0, 1, -data.infectedHeight)
+
+      fill(43, 43, 43);
+      rect(index, -data.infectedHeight, 1, -data.healthHeight)
+
+      fill(184, 184, 184);
+      rect(index, -data.infectedHeight - data.healthHeight, 1, -data.recoveredHeight)
+
+    })
+    pop();
+
   }
-
-//pushing into graphArray
-  graphArray.push({
-    numInfected: numInfected.length,
-    numHealthy: numHealthy.length,
-    numRecovered: numRecovered.length,
-    iHeight: iHeight,
-    hHeight: hHeight,
-    rHeight: rHeight
-  })
-  //console.log(graphArray);
-
-  push();
-  translate(250, 1000);
-  graphArray.forEach(function(data, index) {
-
-    noStroke();
-
-    fill(255, 0, 0)
-    line(index, 0, 1, -data.iHeight)
-
-    fill(43,43,43);
-    rect(index, -data.iHeight, 1, -data.hHeight)
-
-    fill(184, 184, 184);
-    rect(index, -data.iHeight -data.hHeight,1, -data.rHeight)
-
-
-
-  })
-  pop();
 }
 
 //changing the infected balls to Recovered
 //replacing the balls based on the time they were rendered and the frameCount
+//if the frame count is more than the infected birthdate and their lifespan - create a new recovered object with the old infected molecules position and index
 function recovery() {
   molecules.forEach((molecule) => {
     if (frameCount > molecule.Birthdate + molecule.life) {
@@ -223,7 +273,6 @@ function recovery() {
     }
   });
 }
-
 
 // The function drawGrid draws a grid using a nested loop iterating columns(i)
 // within rows(j). colWidth and rowWidth are calculated in the setup(). The style

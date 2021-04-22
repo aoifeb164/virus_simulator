@@ -1,6 +1,6 @@
 /**
  * @Date:   2021-01-19T17:16:18+00:00
- * @Last modified time: 2021-04-21T19:54:45+01:00
+ * @Last modified time: 2021-04-22T17:25:17+01:00
  */
 
 
@@ -19,9 +19,8 @@ class Molecule {
     this.velocity = createVector(random(-2.5, 2.5), random(-2.5, 2.5));
     this.radius = random(obj.minMoleculeSize, obj.maxMoleculeSize);
     this.fillColor = color(255, 0, 0);
-    this.intersectingColor = color(155, 155, 155);
+    this.intersectingColor = color(156, 0, 0);
     this.currentColor = this.fillColor;
-    // this.intersectingColor = color(100,0,0);
     this.index = _i;
   }
 
@@ -35,10 +34,10 @@ class Molecule {
     (obj.showText) ? (
       textSize(10),
       textAlign(CENTER),
-      fill(255,255,255),
+      fill(255, 255, 255),
       text(this.index, this.position.x, this.position.y),
-      fill(255,255,255),
-      text(this.constructor.name, this.position.x, this.position.y + 10 )) : null;
+      fill(255, 255, 255),
+      text(this.constructor.name, this.position.x, this.position.y + 10)) : null;
 
   }
 
@@ -121,7 +120,7 @@ class Molecule {
 
   }
 
-  //change colour when the molecules overlap to the colour set in gui
+  //change colour when the molecules overlap
   changeColor() {
     this.currentColor = this.intersectingColor;
   }
@@ -134,11 +133,11 @@ class Molecule {
   //creating movement of the molecules
   step() {
 
-    (this.position.x >= width - this.radius || this.position.x <= 0 + this.radius) ?
+    (this.position.x >= width - this.radius || this.position.x < 0 + this.radius) ?
     this.velocity.x *= -1: null;
 
-   //minus 160 so the balls dont overlap the graph
-    (this.position.y >= height - this.radius - 160 || this.position.y <= 0 + this.radius) ?
+    //minus 160 so the balls dont overlap the graph
+    (this.position.y >= height - this.radius -160 || this.position.y <= 0 + this.radius + 10 ) ?
     this.velocity.y *= -1: null;
 
     this.position.x += this.velocity.x;
